@@ -8,8 +8,6 @@ const FRAME_START: [u8; 2] = [0x42, 0x4d];
 
 pub struct Pms5003Codec<'a> {
     searcher: TwoWaySearcher<'a>,
-
-    #[cfg(target_os = "macos")]
     frames_skipped: u8,
 }
 
@@ -17,8 +15,6 @@ impl<'a> Pms5003Codec<'a> {
     pub fn new() -> Self {
         Pms5003Codec {
             searcher: TwoWaySearcher::new(&FRAME_START),
-
-            #[cfg(target_os = "macos")]
             frames_skipped: 0,
         }
     }
@@ -36,8 +32,8 @@ impl<'a> Decoder for Pms5003Codec<'a> {
                     src.advance(index);
                 }
 
-                #[cfg(target_os = "macos")]
-                if self.frames_skipped < 2 {
+                // Skip the first 10 frames because the sensor needs some time to do the first measurements
+                if self.frames_skipped < 10 {
                     src.advance(2);
                     self.frames_skipped += 1;
                     return Ok(None);
