@@ -1,4 +1,5 @@
 use axum::{http::StatusCode, response::IntoResponse, routing::get, Router};
+use backoff::{future::retry, ExponentialBackoffBuilder};
 use clap::Parser;
 use futures::stream::StreamExt;
 use pms5003_exporter::{
@@ -10,7 +11,9 @@ use std::{
     net::{IpAddr, Ipv4Addr, SocketAddr},
     path::PathBuf,
     sync::Arc,
+    time::Duration,
 };
+use tap::Tap;
 use tokio::{
     signal::unix::{signal, SignalKind},
     sync::{broadcast, RwLock},
@@ -58,24 +61,44 @@ async fn main() {
     let _ = server_task.await;
 }
 
-async fn read(serial_device: &str, metrics: Arc<RwLock<Metrics>>) -> Result<(), io::Error> {
-    let port = tokio_serial::new(serial_device, 9600).open_native_async()?;
+async fn read(
+    serial_device: &str,
+    metrics: Arc<RwLock<Metrics>>,
+) -> Result<(), tokio_serial::Error> {
+    let backoff = ExponentialBackoffBuilder::default()
+        .with_max_interval(Duration::from_millis(5000))
+        .build();
 
-    let mut reader = pms5003::Pms5003Codec::new().framed(port);
-    println!("port open");
+    retry::<(), _, _, _, _>(backoff, || async {
+        println!("opening serial port");
+        let port = tokio_serial::new(serial_device, 9600)
+            .open_native_async()
+            .tap(|result| {
+                if let Err(error) = result {
+                    println!("Failed to open serial port: {:?}", error);
+                }
+            })?;
 
-    while let Some(frame) = reader.next().await {
-        match frame {
-            Ok(frame) => {
-                println!("frame received: {:?}", frame);
-                let mut metrics = metrics.write().await;
-                metrics.update(&frame);
+        let mut reader = pms5003::Pms5003Codec::new().framed(port);
+        println!("port open");
+
+        while let Some(frame) = reader.next().await {
+            match frame {
+                Ok(frame) => {
+                    println!("frame received: {:?}", frame);
+                    let mut metrics = metrics.write().await;
+                    metrics.update(&frame);
+                }
+                Err(error) => println!("Error reading frame: {:?}", error),
             }
-            Err(error) => println!("error reading frame: {:?}", error),
         }
-    }
 
-    Ok(())
+        Err(backoff::Error::transient(tokio_serial::Error::new(
+            tokio_serial::ErrorKind::Io(io::ErrorKind::ConnectionReset),
+            "Serial read stream ended",
+        )))
+    })
+    .await
 }
 
 async fn serve(

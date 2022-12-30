@@ -24,7 +24,7 @@ pub struct Metrics {
 
 impl Metrics {
     pub fn new() -> Self {
-        let mut registry = <Registry>::with_prefix("pm");
+        let mut registry = <Registry>::with_prefix("airquality");
 
         let pm10: Gauge = Default::default();
         registry.register(
