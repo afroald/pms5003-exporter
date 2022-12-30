@@ -36,77 +36,77 @@ impl Metrics {
         let pm25: Gauge = Default::default();
         registry.register(
             "pm25",
-            "PM1.0 concentration in µg/m³, corrected for standard atmosphere",
+            "PM2.5 concentration in µg/m³, corrected for standard atmosphere",
             pm25.clone(),
         );
 
         let pm100: Gauge = Default::default();
         registry.register(
             "pm100",
-            "PM1.0 concentration in µg/m³, corrected for standard atmosphere",
+            "PM10.0 concentration in µg/m³, corrected for standard atmosphere",
             pm100.clone(),
         );
 
         let pm10_atmos: Gauge = Default::default();
         registry.register(
             "pm10_atmos",
-            "PM1.0 concentration in µg/m³, corrected for standard atmosphere",
+            "PM1.0 concentration in µg/m³, in current atmosphere",
             pm10_atmos.clone(),
         );
 
         let pm25_atmos: Gauge = Default::default();
         registry.register(
             "pm25_atmos",
-            "PM1.0 concentration in µg/m³, corrected for standard atmosphere",
+            "PM2.5 concentration in µg/m³, in current atmosphere",
             pm25_atmos.clone(),
         );
 
         let pm100_atmos: Gauge = Default::default();
         registry.register(
             "pm100_atmos",
-            "PM1.0 concentration in µg/m³, corrected for standard atmosphere",
+            "PM10.0 concentration in µg/m³, in current atmosphere",
             pm100_atmos.clone(),
         );
 
         let pm03_count: Gauge = Default::default();
         registry.register(
             "pm03_count",
-            "PM1.0 concentration in µg/m³, corrected for standard atmosphere",
+            "Number of >0.3µm particles per 0.1L",
             pm03_count.clone(),
         );
 
         let pm05_count: Gauge = Default::default();
         registry.register(
             "pm05_count",
-            "PM1.0 concentration in µg/m³, corrected for standard atmosphere",
+            "Number of >0.5µm particles per 0.1L",
             pm05_count.clone(),
         );
 
         let pm10_count: Gauge = Default::default();
         registry.register(
             "pm10_count",
-            "PM1.0 concentration in µg/m³, corrected for standard atmosphere",
+            "Number of >1.0µm particles per 0.1L",
             pm10_count.clone(),
         );
 
         let pm25_count: Gauge = Default::default();
         registry.register(
             "pm25_count",
-            "PM1.0 concentration in µg/m³, corrected for standard atmosphere",
+            "Number of >2.5µm particles per 0.1L",
             pm25_count.clone(),
         );
 
         let pm50_count: Gauge = Default::default();
         registry.register(
             "pm50_count",
-            "PM1.0 concentration in µg/m³, corrected for standard atmosphere",
+            "Number of >5.0µm particles per 0.1L",
             pm50_count.clone(),
         );
 
         let pm100_count: Gauge = Default::default();
         registry.register(
             "pm100_count",
-            "PM1.0 concentration in µg/m³, corrected for standard atmosphere",
+            "Number of >10.0µm particles per 0.1L",
             pm100_count.clone(),
         );
 
