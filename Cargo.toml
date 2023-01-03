@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.0.32", features = ["derive"] }
-tokio = { version = "1.23.0", features = ["macros", "rt", "rt-multi-thread", "signal"] }
+tokio = { version = "1.23.0", features = ["macros", "rt-multi-thread", "signal"] }
 tokio-util = { version = "0.7.4", features = ["codec"] }
 tokio-serial = { version = "5.4.4", features = ["codec"] }
 bytes = "1.3.0"

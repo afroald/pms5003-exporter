@@ -43,7 +43,7 @@ async fn main() {
 
     let server_task = tokio::spawn(serve(
         SocketAddr::new(IpAddr::V4(cli.host), cli.port),
-        metrics.clone(),
+        Arc::clone(&metrics),
         notify_shutdown.subscribe(),
     ));
 
@@ -67,6 +67,7 @@ async fn read(
 ) -> Result<(), tokio_serial::Error> {
     let backoff = ExponentialBackoffBuilder::default()
         .with_max_interval(Duration::from_millis(5000))
+        .with_max_elapsed_time(None)
         .build();
 
     retry::<(), _, _, _, _>(backoff, || async {
