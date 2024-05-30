@@ -107,15 +107,9 @@ async fn serve(
     metrics: Arc<RwLock<Metrics>>,
     mut notify_shutdown: broadcast::Receiver<()>,
 ) {
-    let app = Router::new().route(
-        "/metrics",
-        get({
-            let metrics = Arc::clone(&metrics);
-            move || handler(metrics)
-        }),
-    );
-
-    let app = app.fallback(handler_404);
+    let app = Router::new()
+        .route("/metrics", get(move || handler(Arc::clone(&metrics))))
+        .fallback(handler_404);
 
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
